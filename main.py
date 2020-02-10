@@ -41,7 +41,7 @@ startPoints = {"a":1,"b":976,"c":1818,"d":2783,"e":3483,"f":4067,"g":4621,"h":50
 params = sys.argv
 del params[0]
 
-# Finally use an slower method to track duplicates for each array
+# Use .intersection to extract duplicates in the new and old array
 verseList = []
 notFound = False
 for i in range(0, len(params)):
@@ -55,12 +55,15 @@ for i in range(0, len(params)):
 	versesJson = json.loads(verses)
 
 	# Do not try and find duplicates if nothing is there
+	# Use built-in python function
 	if i != 0:
-		verseList = set(verseList) & set(versesJson)
+		verseList = set(verseList).intersection(versesJson)
+		verseList = list(verseList)
 	else:
 		verseList = versesJson
 
 if notFound:
 	print('["Not Found"]')
 else:
+	verseList = json.dumps(verseList) # This converts the single quotes to double (python needs that)
 	print(verseList)
