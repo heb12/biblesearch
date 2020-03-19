@@ -1,3 +1,6 @@
+__pycache__
+*.pyc
+
 verses
 words
 jubl2000.js
