@@ -1,22 +1,23 @@
 var fs = require('fs');
 
+// Load bible main data.
+// Change this variable to the bible used.
+var bible = require('./jubl2000.json');
+bible = bible.osis.osisText.div;
+
+// Generate verses as "Gen" or "Genesis"
+// Change this from the notice after generating.
+var length = "short";
+
 // Define a bunch of raw data
 var to = {"Gen":"Genesis","Exod":"Exodus","Lev":"Leviticus","Num":"Numbers","Deut":"Deuteronomy","Josh":"Joshua","Judg":"Judges","Ruth":"Ruth","1Sam":"1st Samuel","2Sam":"2nd Samuel","1Kgs":"1st Kings","2Kgs":"2nd Kings","1Chr":"1st Chronicles","2Chr":"2nd Chronicles","Ezra":"Ezra","Neh":"Nehemiah","Esth":"Esther","Job":"Job","Ps":"Psalms","Prov":"Proverbs","Eccl":"Ecclesiastes","Song":"Song of Solomon","Isa":"Isaiah","Jer":"Jeremiah","Lam":"Lamentations","Ezek":"Ezekiel","Dan":"Daniel","Hos":"Hosea","Joel":"Joel","Amos":"Amos","Obad":"Obadiah","Jonah":"Jonah","Mic":"Micah","Nah":"Nahum","Hab":"Habakkuk","Zeph":"Zephaniah","Hag":"Haggai","Zech":"Zechariah","Mal":"Malachi","Matt":"Matthew","Mark":"Mark","Luke":"Luke","John":"John","Acts":"Acts","Rom":"Romans","1Cor":"1st Corinthians","2Cor":"2nd Corinthians","Gal":"Galatians","Eph":"Ephesians","Phil":"Philippians","Col":"Colossians","1Thess":"1st Thessalonians","2Thess":"2nd Thessalonians","1Tim":"1st Timothy","2Tim":"2nd Timothy","Titus":"Titus","Phlm":"Philemon","Heb":"Hebrews","Jas":"James","1Pet":"1st Peter","2Pet":"2nd Peter","1John":"1st John","2John":"2nd John","3John":"3rd John","Jude":"Jude","Rev":"Revelation"};
 
 var alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
 var alphabetObj = {"a":0,"b":0,"c":0,"d":0,"e":0,"f":0,"g":0,"h":0,"i":0,"j":0,"k":0,"l":0,"m":0,"n":0,"o":0,"p":0,"q":0,"r":0,"s":0,"t":0,"u":0,"v":0,"w":0,"x":0,"y":0,"z":0}
 
-// Load bible main data
-var bible = require('./jubl2000.json');
-bible = bible.osis.osisText.div;
-
 var verses = {
 
 }
-
-// Generate verses as "Gen" or "Genesis"
-// Change this from the notice after generating
-var length = "short";
 
 // Go through entire bible
 for (var book = 0; book < bible.length; book++) {

@@ -1,3 +1,0 @@
-# biblesearch
-
-Improved biblesearch
