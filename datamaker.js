@@ -7,7 +7,7 @@ function shortToLong() {
 
 
     for (var i = 0; i < div.length; i++) {
-        shortToLong[div[i].osisID] = books[i]
+        shortToLong[div[i].osisID] = books[i];
     }
 }
 // short to long

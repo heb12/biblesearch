@@ -42,7 +42,7 @@ It was created as a web page simply for convienence, and not speed.
 			}
 
 			// Process verses into OBJ
-			function processVerses(type, obj) {
+			function processVerses(type, obj, length) {
 				if (!type) {
 					for (var verse = 0; verse < obj.verse.length; verse++) {
 						var text = obj.verse[verse][1];
@@ -55,15 +55,26 @@ It was created as a web page simply for convienence, and not speed.
 
 							// Set to array if not
 							if (typeof verses[textSplit[word]] == "undefined") {
-								verses[textSplit[word]] = [];
+								if (textSplit[word] !== "") {
+									verses[textSplit[word]] = [];
+								}
 							}
 
 							var verseChapter = obj.osisID.split("."); // outputs ["john", "3"]
-							var book = to[verseChapter[0]];
+
+							var book;
+							if (length == "long") {
+								var book = verseChapter[0];
+							} else {
+								// If equal to "short"
+								var book = to[verseChapter[0]];
+							}
+
 							var chapter = verseChapter[1];
 
-
-							verses[textSplit[word]].push(book + " " + chapter + " " + (verse + 1));
+							if (textSplit[word] !== "") {
+								verses[textSplit[word]].push(book + " " + chapter + " " + (verse + 1));
+							}
 						}
 
 					}
