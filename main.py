@@ -12,16 +12,17 @@ startPoints = {"a":1,"b":976,"c":1818,"d":2783,"e":3483,"f":4067,"g":4621,"h":50
 # Use GNU SED to grab specifc line in file
 def getLine(file, line):
     lineResult = subprocess.check_output(
-        "sed -n " + line + "p " + filepath,
+        "sed -n " + str(line) + "p " + file,
         shell = True
     ).decode("utf-8").replace("\n", "")
+    return lineResult
 
 # Use GNU sed and grep to search word file
 def getVerses(word, returnType):
 	firstLetter = word[0:1]
 	startLine = startPoints[firstLetter]
 
-	# Use
+	# Use SED | GREP
 	try:
 		resultLine = subprocess.check_output(
 			"sed -n '" + str(startLine) + ",$ p' data/words | grep -x --line-number '" + word + "'",
@@ -34,7 +35,7 @@ def getVerses(word, returnType):
 	result = resultLine.decode("utf-8").replace("\n", "")
 	result = result.split(":")[0]
 	result = int(result);
-	result = result + startLine - 1 # add back start point, and minus 1
+	result = result + startLine - 2 # add back start point, and minus 1
 
 	# Return the equivalent line in data/verses, with return type
 	return getLine("data/" + returnType, int(result))
@@ -68,3 +69,6 @@ def search(obj):
 	else:
 		verseList = json.dumps(verseList) # This converts the single quotes to double (javascript needs that)
 		return verseList
+
+# Test Script:
+print(search({'words': ["for", "god", "so"], 'returnType': 'versesLong'}))

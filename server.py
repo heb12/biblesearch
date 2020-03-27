@@ -1,12 +1,9 @@
 # This is a flask server
-import flask, json, os
+import flask, json, os, main
 from flask import request
 from waitress import serve
 
 app = flask.Flask(__name__)
-
-import biblesearch.main
-os.chdir('biblesearch')
 
 @app.route('/', methods=['GET'])
 def home():
@@ -25,11 +22,11 @@ def home():
 		length = "versesShort"
 	else:
 		length = "versesLong"
-	
+
 	try:
 		words = words.split(" ")
 
-		output = biblesearch.main.search({'words': words, 'returnType': length})
+		output = main.search({'words': words, 'returnType': length})
 		output = json.dumps(output)
 
 		# Remove backslashes and start and end quotes, may not be the best, but will do for now
