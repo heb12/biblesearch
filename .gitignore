@@ -1,6 +1,8 @@
 __pycache__
 *.pyc
 
-verses
+*.swp
+versesLong
+versesShort
 words
 jubl2000.js
