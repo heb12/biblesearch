@@ -71,4 +71,4 @@ def search(obj):
 		return verseList
 
 # Test Script:
-#print(search({'words': ["for", "god", "so"], 'returnType': 'versesLong'}))
+#print(search({'words': ["for", "god", "so", "loved"], 'returnType': 'versesLong'}))
