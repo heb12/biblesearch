@@ -1,11 +1,21 @@
 # BibleSearch
-This Python program takes multiple words, and searches them in the bible.
+This Python Flask API to take multiple words, and search them in the bible.
+It can be used with or without the HTTP server part.
 
 To compile bible data, run:
 `node compile.js`
 
 Some notes can be found in compile.js, and are needed to
 be looked over before running.
+
+### URL Parameters
+words: The words to search. Seperate by space only.
+callback: callback for JSONP
+length: short/long. Can be used to return longer book names or shorter book names (Gen/Genesis)
+page: Used to shorten the ammount results returned. Ex: 1-10, 10-20, etc
+
+Examples:
+http://api.heb12.com/search?words=god&&page=1-10
 
 ### Enhancement Ideas:
 1. Sort word by first letter alphabetically, but then by popularity.
