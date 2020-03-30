@@ -30,14 +30,14 @@ def home():
 		output = json.loads(output)
 
 		# Result slicing (1-10, 5-20)
-		if results != None:
-			results = results.split("-")
+		if page != None:
+			page = page.split("-")
 
-			if len(results) < 2:
-				return "['Results must be in format 1-10']"
+			if len(page) < 2:
+				return "['page must be in format 1-10']"
 			else:
 				try:
-					output = output[int(results[0]):int(results[1])]
+					output = output[int(page[0]):int(page[1])]
 				except Exception as e:
 					return "['Array slicing error']"
 
