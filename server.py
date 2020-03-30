@@ -1,5 +1,5 @@
-# This is a flask server
-import flask, json, os, main
+# HTTP server
+import flask, json, os, main, logging
 from flask import request
 from waitress import serve
 
@@ -9,6 +9,7 @@ app = flask.Flask(__name__)
 def home():
 	words = request.args.get('words')
 	length = request.args.get('length')
+	results = request.args.get('results')
 	callback = request.args.get('callback')
 
 	# Defaults
@@ -25,19 +26,31 @@ def home():
 
 	try:
 		words = words.split(" ")
-
 		output = main.search({'words': words, 'returnType': length})
-		output = json.dumps(output)
+		output = json.loads(output)
 
-		# Remove backslashes and start and end quotes, may not be the best, but will do for now
-		output = output.replace("\\", "")[1:-1]
+		# Result slicing (1-10, 5-20)
+		if results != None:
+			results = results.split("-")
+
+			if len(results) < 2:
+				return "['Results must be in format 1-10']"
+			else:
+				try:
+					output = output[int(results[0]):int(results[1])]
+				except Exception as e:
+					return "['Array slicing error']"
+
+		# Remove backslashes
+		output = json.dumps(output)
+		output = output.replace("\\", "")
 
 		if callback is None:
 			return output
 		else:
 			return callback + "(" + output + ")"
 	except Exception as e:
-		print(e)
+		logging.exception(e)
 		return "['URL parameter error']"
 
 serve(app, host='0.0.0.0', port=5000)
