@@ -9,7 +9,7 @@ app = flask.Flask(__name__)
 def home():
 	words = request.args.get('words')
 	length = request.args.get('length')
-	results = request.args.get('results')
+	page = request.args.get('page')
 	callback = request.args.get('callback')
 
 	# Defaults
