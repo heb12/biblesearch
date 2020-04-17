@@ -1,4 +1,4 @@
-# HTTP server
+# HTTP server hosted on port 5000
 import flask, json, os, main, logging
 from flask import request
 from waitress import serve
@@ -19,10 +19,10 @@ def home():
 		length = 'long'
 
 	# Replace length with proper file name
-	if length == "short":
-		length = "versesShort"
-	else:
+	if length == "long":
 		length = "versesLong"
+	else:
+		length = "versesShort"
 
 	try:
 		words = words.split(" ")

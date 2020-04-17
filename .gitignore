@@ -5,6 +5,6 @@ __pycache__
 versesLong
 versesShort
 words
-jubl2000.js
+*.json
 
 data/
