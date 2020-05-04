@@ -9,10 +9,8 @@ node compile.js ./jubl2000.json
 ```
 
 ### URL Parameters
-words: The words to search. Separate by space only.
-callback: callback for JSONP
-length: short/long. Can be used to return longer book names or shorter book names (Gen/Genesis)
-page: Used to shorten the amount results returned. Ex: 1-10, 10-20, etc
+* words: The words to search. Separate by space only.
+* callback: callback for JSONP
 
 Examples:
 http://api.heb12.com/search?words=god&page=1-10
