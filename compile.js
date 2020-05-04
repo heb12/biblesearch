@@ -1,139 +1,166 @@
+var alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+var alphabetObj = {"a":0,"b":0,"c":0,"d":0,"e":0,"f":0,"g":0,"h":0,"i":0,"j":0,"k":0,"l":0,"m":0,"n":0,"o":0,"p":0,"q":0,"r":0,"s":0,"t":0,"u":0,"v":0,"w":0,"x":0,"y":0,"z":0}
 var fs = require('fs');
 
-// First 2 parameters are useless garbage
+// Check parameters
 var param = process.argv;
 if (param.length == 2) {
 	console.log("Not enough parameters.\nUse as `node compile.js ./jubl2000.json`");
-	return;
 }
+
+// Initialize files before everything
+if (!fs.existsSync("data")){
+    fs.mkdirSync("data");
+
+	fs.writeFile("data/verses", "", function() {
+		console.log("Created verse file.");
+	});
+	fs.writeFile("data/words", "", function() {
+		console.log("Created words file.");
+	});
+} else {
+	error("/data folder exists. Please delete it.");
+}
+
+// `words` is structured like:
+// {"jesus", [name, popularity, ["Heb 4 12", "John 2 5", ".."]]}
+var words = {};
 
 // Load bible main data.
-var bible = require(param[2]);
-bible = bible.osis.osisText.div;
+var loadBible = require(param[2]);
+loopBible(loadBible);
 
-// Generate verses as "Gen" or "Genesis"
-// Change this from the notice after generating.
-var length = "short";
-if (param.length == 4) {
-	length = param[3];
+// Now, sort the words by first letter, then by popularity.
+var sortedPopularity = [];
+sortWords();
+
+// Write directly from sortedPopularity
+for (var i = 0; i < sortedPopularity.length; i++) {
+	fs.appendFileSync("data/verses", sortedPopularity[i][0] + "\n");
 }
 
-// Define a bunch of raw data (too lazy to put in another file?)
-var to = {"Gen":"Genesis","Exod":"Exodus","Lev":"Leviticus","Num":"Numbers","Deut":"Deuteronomy","Josh":"Joshua","Judg":"Judges","Ruth":"Ruth","1Sam":"1st Samuel","2Sam":"2nd Samuel","1Kgs":"1st Kings","2Kgs":"2nd Kings","1Chr":"1st Chronicles","2Chr":"2nd Chronicles","Ezra":"Ezra","Neh":"Nehemiah","Esth":"Esther","Job":"Job","Ps":"Psalms","Prov":"Proverbs","Eccl":"Ecclesiastes","Song":"Song of Solomon","Isa":"Isaiah","Jer":"Jeremiah","Lam":"Lamentations","Ezek":"Ezekiel","Dan":"Daniel","Hos":"Hosea","Joel":"Joel","Amos":"Amos","Obad":"Obadiah","Jonah":"Jonah","Mic":"Micah","Nah":"Nahum","Hab":"Habakkuk","Zeph":"Zephaniah","Hag":"Haggai","Zech":"Zechariah","Mal":"Malachi","Matt":"Matthew","Mark":"Mark","Luke":"Luke","John":"John","Acts":"Acts","Rom":"Romans","1Cor":"1st Corinthians","2Cor":"2nd Corinthians","Gal":"Galatians","Eph":"Ephesians","Phil":"Philippians","Col":"Colossians","1Thess":"1st Thessalonians","2Thess":"2nd Thessalonians","1Tim":"1st Timothy","2Tim":"2nd Timothy","Titus":"Titus","Phlm":"Philemon","Heb":"Hebrews","Jas":"James","1Pet":"1st Peter","2Pet":"2nd Peter","1John":"1st John","2John":"2nd John","3John":"3rd John","Jude":"Jude","Rev":"Revelation"};
-var alphabet = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']
-var alphabetObj = {"a":0,"b":0,"c":0,"d":0,"e":0,"f":0,"g":0,"h":0,"i":0,"j":0,"k":0,"l":0,"m":0,"n":0,"o":0,"p":0,"q":0,"r":0,"s":0,"t":0,"u":0,"v":0,"w":0,"x":0,"y":0,"z":0}
-
-var verses = {
-
+for (var i = 0; i < sortedPopularity.length; i++) {
+	fs.appendFileSync("data/words", JSON.stringify(sortedPopularity[i][1][1]) + "\n");
 }
 
-// Go through entire bible
-for (var book = 0; book < bible.length; book++) {
-    if (!book.chapter) {
-        for (var chapter = 0; chapter < bible[book]['chapter'].length; chapter++) {
-            processVerses(false, bible[book]['chapter'][chapter], length);
-        }
-    } else {
-        processVerses(true, bible[book]['chapter'][chapter], length);
-    }
+console.log(
+	"Everything Finished. Used",
+	(process.memoryUsage().heapUsed) / 1014 / 1024,
+	"Megabytes of memory."
+);
+
+
+function error(message) {
+	console.log(message);
+	process.exit(1);
 }
 
-// Process verses into OBJ
-// Type refers to how JSON is structured, one chapter or multiple
-function processVerses(type, obj, length) {
-    if (!type) {
-        for (var verse = 0; verse < obj.verse.length; verse++) {
-            var text = obj.verse[verse][1];
-            text = text.replace(/([0-9,!?.\(\):;'><\[\]\"])/gm, "");
-            text = text.toLowerCase();
+// Go through entire Bible, and process the verses
+function loopBible(bible) {
+	var osisDiv = bible.osis.osisText.div;
 
-            textSplit = text.split(" ");
+	for (var b = 0; b < osisDiv.length; b++) {
+		var chapter = osisDiv[b]['chapter'];
 
-            for (var word = 0; word < textSplit.length; word++) {
+		// Return true if book has 1 chapter (json structured differently)
+		var hasChapter = !osisDiv[b].chapter.length;
+		if (hasChapter) {
+			processVerses(osisDiv[b].chapter.verse);
+		} else {
+			for (var c = 0; c < chapter.length; c++) {
+		        processVerses(chapter[c].verse);
+		    }
+		}
+	}
+}
 
-                // Set to array if not
-                if (typeof verses[textSplit[word]] == "undefined") {
+// Process verse text into JSON
+function processVerses(verses) {
+    for (var v = 0; v < verses.length; v++) {
+		var osisID = verses[v][0].osisID;
+		var text = verses[v][1];
+		text = text.toLowerCase();
 
-                    // Filter out double spaces
-                    if (textSplit[word] !== "") {
-                        verses[textSplit[word]] = [];
-                    }
-                }
+		// Remove any Non a-zA-Z and space character.
+        text = text.replace(/([^A-Za-z ]+)/gm, "");
 
-                var verseChapter = obj.osisID.split("."); // outputs ["john", "3"]
+		// Replace any double or more spaces with one space.
+		text = text.replace(/( )+/gm, " ");
 
-                // Use longer names or else, short
-                var book;
-                if (length == "long") {
-                    var book = verseChapter[0];
-                } else {
-                    var book = to[verseChapter[0]];
-                }
+        var textSplit = text.split(" ");
+        for (var word = 0; word < textSplit.length; word++) {
+			var isNothing = textSplit[word] != "";
 
-                var chapter = verseChapter[1];
+            // Check if word is already stored, and create key in JSON.
+            if (typeof words[textSplit[word]] == "undefined" && isNothing) {
+                words[textSplit[word]] = [0, []];
+            }
 
-                // Filter out double spaces again
-                if (textSplit[word] !== "") {
-                    verses[textSplit[word]].push(book + " " + chapter + " " + (verse + 1));
-                }
+			// Make osisID easier to read (replaces dots with spaces)
+			var newOsisID = osisID.replace(/\./gm, " ");
+
+            // Double check to make sure there are no double spaces.
+            if (isNothing) {
+                words[textSplit[word]][1].push(newOsisID);
+				words[textSplit[word]][0]++;
             }
         }
     }
 }
 
-// Sort alphabetically
-var allWords = Object.keys(verses);
-allWords = allWords.sort();
+function sortWords() {
+	var entries = Object.entries(words);
 
-// This should create a text "file" with every word, and the verses after a space
-var verseFile = '';
-for (var i = 1; i < allWords.length; i++) {
-    verseFile += '["' + verses[allWords[i]].join('","') + '"]\n';
+	// Sort entire thing Alphabetically (custom char support)
+	entries.sort(function(a, b) {
+		return a[0].localeCompare(b[0]);
+	});
+
+	// Go through word list and map where each letters starts (use alphabetObj)
+	// `entries.length - 1`: Avoid trying to get char of next item when on last item
+	for (var w = 0; w < entries.length - 1; w++) {
+		var currentLetter = entries[w][0][0];
+		var nextLetter = entries[w + 1][0][0];
+
+		// If last first char is different from current first char
+		if (currentLetter !== nextLetter) {
+			alphabetObj[nextLetter] = w;
+
+			// All but the first letter is 1 off
+			if (w != 0) {
+				alphabetObj[nextLetter]++;
+			}
+		}
+	}
+
+	// Sort by popularity, but just with the same first chars
+	for (var l = 0; l < alphabet.length; l++) {
+		var currentLetter = alphabetObj[alphabet[l]];
+
+		// Go through conditions to make sure there are no errors
+		var nextLetter;
+		if (alphabetObj[alphabet[l + 1]] == 0) {
+			// If next letter has no verses (Eg letter x)
+			nextLetter = alphabetObj[alphabet[l + 2]] - 1;
+		} else if (l + 1 >= alphabet.length) {
+			// If letter is last in alphabet
+			nextLetter = entries.length - 1;
+		} else {
+			nextLetter = alphabetObj[alphabet[l + 1]] - 1;
+		}
+
+		// If current letter has no verses (Eg letter X)
+		if (currentLetter != 0 || l == 0) {
+			var selection = entries.slice(currentLetter, nextLetter);
+
+			selection.sort(function(a, b) {
+				return a[1][0] - b[1][0];
+			});
+			selection.reverse();
+
+			sortedPopularity = sortedPopularity.concat(selection);
+		}
+	}
+
+	return sortedPopularity;
 }
-
-// Turn into breaks
-var wordFile = allWords.join("\n");
-
-// Generate alphabet file for speedier searching
-var alphabetFile = "";
-var currentLetter = 0;
-
-for (var l = 0; l < alphabet.length; l++) {
-
-    var letter = alphabet[l];
-    for (var i = 0; i < allWords.length; i++) {
-
-        var subWord = allWords[i].substring(0, 1);
-        if (subWord == letter) {
-            alphabetObj[letter] = i;
-            break;
-        }
-    }
-}
-
-// First letter is 1 ahead
-alphabetObj.a--
-
-// Create data folder if not already created
-if (!fs.existsSync("data")){
-    fs.mkdirSync("data");
-}
-
-// Create verse file according to length
-var verseFileName;
-if (length == "long") {
-    verseFileName = "versesLong";
-} else {
-    verseFileName = "versesShort"
-}
-
-fs.writeFile("data/" + verseFileName, verseFile, function() {
-    console.log("Created " + verseFileName);
-});
-
-fs.writeFile("data/words", wordFile, function() {
-    console.log("Created word file");
-});
-
-console.log("Notice: " + verseFileName + " was created, and the other verse length file was not.");
-console.log("To generate the other file, change the last parameter for it before running. (see readme.md)\n")

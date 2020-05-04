@@ -18,7 +18,7 @@ def getLine(file, line):
     return lineResult
 
 # Use GNU sed and grep to search word file
-def getVerses(word, returnType):
+def getVerses(word):
 	firstLetter = word[0:1]
 	startLine = startPoints[firstLetter]
 
@@ -29,7 +29,7 @@ def getVerses(word, returnType):
 			shell = True
 		)
 	except Exception as e:
-		return "NOTFOUND" # Return text if command returns error (word not found)
+		return [1, "Error, word not found."] # Return text if command returns error (word not found)
 
 	# Sed = Grep returns as bytes, and 123:word, so parse it
 	result = resultLine.decode("utf-8").replace("\n", "")
@@ -38,21 +38,19 @@ def getVerses(word, returnType):
 	result = result + startLine - 2 # add back start point, and minus 1
 
 	# Return the equivalent line in data/verses, with return type
-	return getLine("data/" + returnType, int(result))
+	return getLine("data/verses", int(result))
 
 def search(obj):
 	words = obj['words']
 
 	# Use .intersection to extract duplicates in the new and old array
 	verseList = []
-	notFound = False
 	for i in range(0, len(words)):
-		verses = getVerses(words[i], obj['returnType'])
+		verses = getVerses(words[i])
 
 		# Return if nothing found
-		if verses == "NOTFOUND":
-			notFound = True
-			break
+		if verses[0] == 1:
+			return verses[1]
 
 		versesJson = json.loads(verses)
 
@@ -64,11 +62,8 @@ def search(obj):
 		else:
 			verseList = versesJson
 
-	if notFound:
-		return '["Not Found"]'
-	else:
 		verseList = json.dumps(verseList) # This converts the single quotes to double (javascript needs that)
 		return verseList
 
 # Test Script:
-#print(search({'words': ["for", "god", "so", "loved"], 'returnType': 'versesLong'}))
+print(search({'words': ["for", "god", "so", "loved"]}))
