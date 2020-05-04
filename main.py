@@ -7,9 +7,11 @@ from collections import Counter
 import sys, json, subprocess, copy
 
 # This tell grep where to start alphabetically, so we don't read uncessessary data
-startPoints = {"a":1,"b":976,"c":1818,"d":2783,"e":3483,"f":4067,"g":4621,"h":5030,"i":5695,"j":6082,"k":6456,"l":6607,"m":7014,"n":7687,"o":7950,"p":8217,"q":9085,"r":9122,"s":9749,"t":11252,"u":11935,"v":12121,"w":12246,"x":0,"y":12683,"z":12718}
+with open("data/alphabet.json") as file:
+	startPoints = file.read()
+	startPoints = json.loads(startPoints);
 
-# Use GNU SED to grab specifc line in file
+# Use Sed to grab specifc line in file
 def getLine(file, line):
     lineResult = subprocess.check_output(
         "sed -n " + str(line) + "p " + file,
@@ -22,20 +24,21 @@ def getVerses(word):
 	firstLetter = word[0:1]
 	startLine = startPoints[firstLetter]
 
-	# Use SED | GREP
+	# Use Sed | Grep
 	try:
 		resultLine = subprocess.check_output(
-			"sed -n '" + str(startLine) + ",$ p' data/words | grep -x --line-number '" + word + "'",
+			"sed -n '" + str(startLine) + ",$ p' data/words | grep -x --line-number '" + word + "'  | sed 's/:.*//'",
 			shell = True
 		)
 	except Exception as e:
 		return [1, "Error, word not found."] # Return text if command returns error (word not found)
 
-	# Sed = Grep returns as bytes, and 123:word, so parse it
+	# Filter out the string some
 	result = resultLine.decode("utf-8").replace("\n", "")
-	result = result.split(":")[0]
 	result = int(result);
-	result = result + startLine - 2 # add back start point, and minus 1
+
+	# add back start point, and minus 1
+	result = result + startLine - 1
 
 	# Return the equivalent line in data/verses, with return type
 	return getLine("data/verses", int(result))

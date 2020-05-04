@@ -18,6 +18,9 @@ if (!fs.existsSync("data")){
 	fs.writeFile("data/words", "", function() {
 		console.log("Created words file.");
 	});
+	fs.writeFile("data/alphabet.json", "", function() {
+		console.log("Created alphabet.json file.");
+	});
 } else {
 	error("/data folder exists. Please delete it.");
 }
@@ -32,23 +35,20 @@ loopBible(loadBible);
 
 // Now, sort the words by first letter, then by popularity.
 var sortedPopularity = [];
+var entries = Object.entries(words);
 sortWords();
+
+fs.appendFileSync("data/alphabet.json", JSON.stringify(alphabetObj));
 
 // Write directly from sortedPopularity
 for (var i = 0; i < sortedPopularity.length; i++) {
-	fs.appendFileSync("data/verses", sortedPopularity[i][0] + "\n");
+	fs.appendFileSync("data/words", sortedPopularity[i][0] + "\n");
 }
 
+// Write data/words file
 for (var i = 0; i < sortedPopularity.length; i++) {
-	fs.appendFileSync("data/words", JSON.stringify(sortedPopularity[i][1][1]) + "\n");
+	fs.appendFileSync("data/verses", JSON.stringify(sortedPopularity[i][1][1]) + "\n");
 }
-
-console.log(
-	"Everything Finished. Used",
-	(process.memoryUsage().heapUsed) / 1014 / 1024,
-	"Megabytes of memory."
-);
-
 
 function error(message) {
 	console.log(message);
@@ -109,29 +109,12 @@ function processVerses(verses) {
 }
 
 function sortWords() {
-	var entries = Object.entries(words);
-
 	// Sort entire thing Alphabetically (custom char support)
 	entries.sort(function(a, b) {
 		return a[0].localeCompare(b[0]);
 	});
 
-	// Go through word list and map where each letters starts (use alphabetObj)
-	// `entries.length - 1`: Avoid trying to get char of next item when on last item
-	for (var w = 0; w < entries.length - 1; w++) {
-		var currentLetter = entries[w][0][0];
-		var nextLetter = entries[w + 1][0][0];
-
-		// If last first char is different from current first char
-		if (currentLetter !== nextLetter) {
-			alphabetObj[nextLetter] = w;
-
-			// All but the first letter is 1 off
-			if (w != 0) {
-				alphabetObj[nextLetter]++;
-			}
-		}
-	}
+	makeAlphabet(entries, 1);
 
 	// Sort by popularity, but just with the same first chars
 	for (var l = 0; l < alphabet.length; l++) {
@@ -162,5 +145,26 @@ function sortWords() {
 		}
 	}
 
-	return sortedPopularity;
+	makeAlphabet(sortedPopularity, 2);
+}
+
+// Go through word list and map where each letters starts (use alphabetObj)
+// `entries.length - 1`: Avoid trying to get char of next item when on last item
+// Offset is for small offset mistakes after sorting.
+function makeAlphabet(array, offset) {
+	for (var w = 0; w < array.length - 1; w++) {
+		var currentLetter = array[w][0][0];
+		var nextLetter = array[w + 1][0][0];
+
+		// If last first char is different from current first char
+		if (currentLetter != nextLetter) {
+			console.log(array[w][0], array[w + 1][0]);
+			alphabetObj[nextLetter] = w;
+
+			// All but the first letter is 1 off
+			if (w != 0) {
+				alphabetObj[nextLetter] += offset;
+			}
+		}
+	}
 }
