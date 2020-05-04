@@ -25,9 +25,10 @@ def home():
 		length = "versesShort"
 
 	try:
-		words = words.split(" ")
-		output = main.search({'words': words, 'returnType': length})
-		output = json.loads(output)
+		output = main.searchString(words)
+
+		if output["error"] == 1:
+			return output
 
 		# Result slicing (1-10, 5-20)
 		if page != None:
@@ -37,13 +38,9 @@ def home():
 				return "['page must be in format 1-10']"
 			else:
 				try:
-					output = output[int(page[0]):int(page[1])]
+					output.verses = output.verses[int(page[0]):int(page[1])]
 				except Exception as e:
 					return "['Array slicing error']"
-
-		# Remove backslashes
-		output = json.dumps(output)
-		output = output.replace("\\", "")
 
 		if callback is None:
 			return output

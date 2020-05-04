@@ -4,25 +4,38 @@ var fs = require('fs');
 
 // Check parameters
 var param = process.argv;
-if (param.length == 2) {
+var folder = "data"
+if (param[2] == "-h") {
+	console.log(`
+		Biblesearch\n
+		node compile.js <file> <output folder>\n
+		file: Input file, Ex: ./jubl2000.json\n
+		output folder: Folder to output to. Ex: data\n
+	`);
+} else if (param.length == 2) {
 	console.log("Not enough parameters.\nUse as `node compile.js ./jubl2000.json`");
+} else if (param.length == 4) {
+	folder = param[3];
 }
 
 // Initialize files before everything
-if (!fs.existsSync("data")){
-    fs.mkdirSync("data");
+if (!fs.existsSync(folder)){
+    fs.mkdirSync(folder);
 
-	fs.writeFile("data/verses", "", function() {
+	fs.writeFile(folder + "/verses", "", function() {
 		console.log("Created verse file.");
 	});
-	fs.writeFile("data/words", "", function() {
+
+	fs.writeFile(folder + "/words", "", function() {
 		console.log("Created words file.");
 	});
-	fs.writeFile("data/alphabet.json", "", function() {
+
+	fs.writeFile(folder + "/alphabet.json", "", function() {
 		console.log("Created alphabet.json file.");
 	});
+
 } else {
-	error("/data folder exists. Please delete it.");
+	error(folder + "/ folder exists. Please delete it.");
 }
 
 // `words` is structured like:
@@ -38,16 +51,16 @@ var sortedPopularity = [];
 var entries = Object.entries(words);
 sortWords();
 
-fs.appendFileSync("data/alphabet.json", JSON.stringify(alphabetObj));
+fs.appendFileSync(folder + "/alphabet.json", JSON.stringify(alphabetObj));
 
 // Write directly from sortedPopularity
 for (var i = 0; i < sortedPopularity.length; i++) {
-	fs.appendFileSync("data/words", sortedPopularity[i][0] + "\n");
+	fs.appendFileSync(folder + "/words", sortedPopularity[i][0] + "\n");
 }
 
 // Write data/words file
 for (var i = 0; i < sortedPopularity.length; i++) {
-	fs.appendFileSync("data/verses", JSON.stringify(sortedPopularity[i][1][1]) + "\n");
+	fs.appendFileSync(folder + "/verses", JSON.stringify(sortedPopularity[i][1][1]) + "\n");
 }
 
 function error(message) {
@@ -92,7 +105,7 @@ function processVerses(verses) {
 			var isNothing = textSplit[word] != "";
 
             // Check if word is already stored, and create key in JSON.
-            if (typeof words[textSplit[word]] == "undefined" && isNothing) {
+            if (typeof words[textSplit[word]] != "object" && isNothing) {
                 words[textSplit[word]] = [0, []];
             }
 
@@ -101,7 +114,7 @@ function processVerses(verses) {
 
             // Double check to make sure there are no double spaces.
             if (isNothing) {
-                words[textSplit[word]][1].push(newOsisID);
+				words[textSplit[word]][1].push(newOsisID);
 				words[textSplit[word]][0]++;
             }
         }
@@ -158,7 +171,6 @@ function makeAlphabet(array, offset) {
 
 		// If last first char is different from current first char
 		if (currentLetter != nextLetter) {
-			console.log(array[w][0], array[w + 1][0]);
 			alphabetObj[nextLetter] = w;
 
 			// All but the first letter is 1 off
