@@ -4,7 +4,7 @@ It can be used with or without the HTTP server part.
 
 To compile Bible data, run:
 ```
-wget http://api.heb12.com/translations-json/en/jubl2000.json
+wget http://api.heb12.com/translations/json/en/jubl2000.json
 node compile.js ./jubl2000.json
 ```
 
