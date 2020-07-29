@@ -6,12 +6,10 @@ var fs = require('fs');
 var param = process.argv;
 var folder = "data"
 if (param[2] == "-h") {
-	console.log(`
-		Biblesearch (v0.1.1)\n
-		node compile.js <file> <output folder>\n
-		file: Input file, Ex: ./jubl2000.json\n
-		output folder: Folder to output to. Ex: data\n
-	`);
+	console.log(`Biblesearch (v0.1.1)\n
+  node compile.js <file> <output folder>\n
+  file: Input file, Ex: ./jubl2000.json\n
+  output folder: Folder to output to. Ex: data\n`);
 } else if (param.length == 2) {
 	console.log("Not enough parameters.\nUse as `node compile.js ./jubl2000.json`");
 } else if (param.length == 4) {
@@ -27,14 +25,8 @@ fs.writeFile(folder + "/words", "", function() {
 	console.log("Created words file.");
 });
 
-fs.mkdirSync("alphabet");
-
-fs.writeFile(folder + "alphabet/letter", "", function() {
+fs.writeFile(folder + "/alphabet.json", "", function() {
 	console.log("Created alphabet letter file.");
-});
-
-fs.writeFile(folder + "alphabet/letter", "", function() {
-	console.log("Created alphabet line file.");
 });
 
 // `words` is structured like:
