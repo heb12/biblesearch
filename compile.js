@@ -7,7 +7,7 @@ var param = process.argv;
 var folder = "data"
 if (param[2] == "-h") {
 	console.log(`
-		Biblesearch\n
+		Biblesearch (v0.1.1)\n
 		node compile.js <file> <output folder>\n
 		file: Input file, Ex: ./jubl2000.json\n
 		output folder: Folder to output to. Ex: data\n
@@ -19,24 +19,23 @@ if (param[2] == "-h") {
 }
 
 // Initialize files before everything
-if (!fs.existsSync(folder)){
-    fs.mkdirSync(folder);
+fs.writeFile(folder + "/verses", "", function() {
+	console.log("Created verse file.");
+});
 
-	fs.writeFile(folder + "/verses", "", function() {
-		console.log("Created verse file.");
-	});
+fs.writeFile(folder + "/words", "", function() {
+	console.log("Created words file.");
+});
 
-	fs.writeFile(folder + "/words", "", function() {
-		console.log("Created words file.");
-	});
+fs.mkdirSync("alphabet");
 
-	fs.writeFile(folder + "/alphabet.json", "", function() {
-		console.log("Created alphabet.json file.");
-	});
+fs.writeFile(folder + "alphabet/letter", "", function() {
+	console.log("Created alphabet letter file.");
+});
 
-} else {
-	error(folder + "/ folder exists. Please delete it.");
-}
+fs.writeFile(folder + "alphabet/letter", "", function() {
+	console.log("Created alphabet line file.");
+});
 
 // `words` is structured like:
 // {"jesus", [name, popularity, ["Heb 4 12", "John 2 5", ".."]]}

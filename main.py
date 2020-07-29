@@ -6,7 +6,7 @@ from subprocess import check_output
 from collections import Counter
 import sys, json, subprocess, copy, re
 
-dataFolder = "data"
+dataFolder = sys.argv[1]
 
 # This tell grep where to start alphabetically, so we don't read uncessessary data
 with open(dataFolder + "/alphabet.json") as file:
