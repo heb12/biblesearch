@@ -9,3 +9,5 @@ words
 
 data/
 data
+*.out
+a.out

@@ -1,0 +1,3 @@
+[submodule "biblec"]
+	path = biblec
+	url = https://code.heb12.com/heb12/biblec
