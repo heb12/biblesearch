@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "biblec/main.h"
-#include "biblec/biblec.h"
 
 struct Search {
 	char *word[20];
@@ -25,13 +24,10 @@ int findWords(struct Search *search, char *word) {
 }
 
 int main() {
-	struct Translation translation;
-	int tryFile = 0;
-	parseIndexFile(
-		&tryFile,
+	struct Biblec_translation translation;
+	int tryFile = biblec_parse(
 		&translation,
-		"biblec/bibles/web.i",
-		"biblec/bibles/web.t"
+		"biblec/bibles/kj2000.i"
 	);
 
 	if (tryFile) {
