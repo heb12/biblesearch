@@ -1,5 +1,5 @@
 default:
-	@$(CC) biblec/biblec.c test.c
+	@$(CC) biblec/biblec.c main.c
 	@./a.out
 	@rm *.out
 
