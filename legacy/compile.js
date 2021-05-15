@@ -42,7 +42,7 @@ var sortedPopularity = [];
 var entries = Object.entries(words);
 sortWords();
 
-fs.appendFileSync(folder + "/alphabet.json", JSON.stringify(alphabetObj));
+fs.appendFileSync(folder + "/alphabet.json", Object.values(alphabetObj).join("\n"));
 
 // Write directly from sortedPopularity
 for (var i = 0; i < sortedPopularity.length; i++) {
@@ -51,7 +51,7 @@ for (var i = 0; i < sortedPopularity.length; i++) {
 
 // Write data/words file
 for (var i = 0; i < sortedPopularity.length; i++) {
-	fs.appendFileSync(folder + "/verses", JSON.stringify(sortedPopularity[i][1][1]) + "\n");
+	fs.appendFileSync(folder + "/verses", sortedPopularity[i][1][1].join(",") + "\n");
 }
 
 function error(message) {

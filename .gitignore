@@ -13,3 +13,5 @@ legacy/data/
 legacy/data
 *.out
 a.out
+
+_main.c

@@ -1,9 +1,13 @@
-default:
-	@$(CC) biblec/biblec.c main.c
-	@./a.out
-	@rm *.out
+CC := tcc
+t ?= web
 
+default:
+	@$(CC) biblec/biblec.c bsearch.c test.c -o test.out
+	@./test.out
+	@rm -rf *.out
+
+# make setup f=kjv
 setup:
-	@cd biblec; mkdir bibles; cd bibles;
-	@cd biblec/bibles; wget http://api.heb12.com/translations/biblec/kj2000.i
-	@cd biblec/bibles; wget http://api.heb12.com/translations/biblec/kj2000.t
+	-@cd biblec; mkdir bibles
+	@cd biblec/bibles; wget http://api.heb12.com/translations/biblec/$(t).i
+	@cd biblec/bibles; wget http://api.heb12.com/translations/biblec/$(t).t
