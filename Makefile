@@ -1,4 +1,4 @@
-CC := tcc
+CC := cc
 t ?= web
 
 default:
