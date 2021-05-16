@@ -59,7 +59,7 @@ int getHits(int hits[], char string[], struct Biblec_translation *translation) {
 		return -1;
 	}
 
-	char word[MAX_WORD];
+	char word[BSEARCH_MAX_WORD];
 	char buffer[VERSE_LENGTH];
 
 	while (fgets(buffer, VERSE_LENGTH, verseFile) != NULL) {
@@ -75,7 +75,7 @@ int getHits(int hits[], char string[], struct Biblec_translation *translation) {
 				wc++;
 			} else if (buffer[c] == ' ' || buffer[c] == '\n') {
 				// Quit if no useful data was read
-				if (wc <= MIN_WORD) {
+				if (wc <= BSEARCH_MIN_WORD) {
 					word[wc] = '\0';
 					wc = 0;
 					continue;
@@ -91,7 +91,7 @@ int getHits(int hits[], char string[], struct Biblec_translation *translation) {
 					hits[hit] = line;
 					hit++;
 
-					if (hit > MAX_HITS) {
+					if (hit > BSEARCH_MAX_HITS) {
 						free(hits);
 						fclose(verseFile);
 						return -1;
@@ -111,7 +111,7 @@ int getHits(int hits[], char string[], struct Biblec_translation *translation) {
 	return hit;
 }
 
-int bsearch_open(char **words, int length, int result[],
+int bsearch_open(char words[][BSEARCH_MAX_WORD], int length, int result[],
 		struct Biblec_translation *translation) {
 	int hit1 = getHits(result, words[0], translation);
 	if (hit1 == -1) {
@@ -124,11 +124,11 @@ int bsearch_open(char **words, int length, int result[],
 
 	int m = 0;
 	for (int w = 1; w < length; w++) {
-		if (strlen(words[w]) <= MIN_WORD) {
+		if (strlen(words[w]) <= BSEARCH_MIN_WORD) {
 			continue;
 		}
 		
-		int *hits2 = malloc(MAX_HITS);
+		int *hits2 = malloc(BSEARCH_MAX_HITS);
 		int hit2 = getHits(hits2, words[w], translation);
 		if (hit2 == -1) {
 			free(hits2);
@@ -137,7 +137,7 @@ int bsearch_open(char **words, int length, int result[],
 
 		// Match last word with current word
 		m = 0;
-		int *temp = malloc(MAX_HITS);
+		int *temp = malloc(BSEARCH_MAX_HITS);
 		for (int x = 0; x < hit1; x++) {
 			for (int y = 0; y < hit2; y++) {
 				if (result[x] == hits2[y]) {
@@ -146,7 +146,7 @@ int bsearch_open(char **words, int length, int result[],
 
 					// Max results reached, don't quit, but
 					// kill matching silently
-					if (m > MAX_HITS) {
+					if (m > BSEARCH_MAX_HITS) {
 						free(hits2);
 						free(temp);
 						return m;
