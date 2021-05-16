@@ -1,8 +1,8 @@
-CC := cc
 t ?= web
+dir ?= ../heb12cli
 
 default:
-	@$(CC) biblec/biblec.c bsearch.c test.c -o test.out
+	@$(CC) -I$(dir) $(dir)/biblec/biblec.c bsearch.c test.c -o test.out
 	@./test.out
 	@rm -rf *.out
 

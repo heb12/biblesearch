@@ -2,19 +2,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "biblesearch.h"
+#include <biblec/main.h>
+
+#include "bsearch.h"
+
+struct Biblec_translation translation;
 
 int main() {
+	int tryFile = biblec_parse(
+		&translation,
+		"/home/dan/.local/share/heb12/web.i"
+	);
+
+	if (tryFile) {
+		return -1;
+	}
+
 	char *mySearch[] = {
 		"created",
 		"beginning"
 	};
 
 	int *result = malloc(MAX_HITS);
-	int c = bsearch_get(
-		mySearch, 
+	int c = bsearch_open(
+		mySearch,
 		sizeof(mySearch) / sizeof(mySearch[0]),
-		result
+		result,
+		&translation
 	);
 
 	printf("Result: %d\n", c);
@@ -25,16 +39,16 @@ int main() {
 
 	char buffer[128];
 	for (int i = 0; i < c; i++) {
-		bsearch_getVerse(buffer, result[i]);
+		bsearch_getVerse(buffer, result[i], &translation);
 		printf("%d\t%s\n", result[i], buffer);
 	}
 
 	free(result);
 
 	puts("bsearch_getVerse bugs:");
-	bsearch_getVerse(buffer, 30650);
+	bsearch_getVerse(buffer, 30650, &translation);
 	puts(buffer);
-	bsearch_getVerse(buffer, 31093);
+	bsearch_getVerse(buffer, 31093, &translation);
 	puts(buffer);
 
 	return 0;

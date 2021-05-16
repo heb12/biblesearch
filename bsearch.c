@@ -1,28 +1,22 @@
-// This will find duplicates in a file, sadly
-// not accurate searching yet, needs to be fixed
-
 // TODO:
 // error system
 // bsearch? biblesearch?
-
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "biblec/main.h"
-#include "biblesearch.h"
+#include <biblec/main.h>
 
-struct Biblec_translation translation;
+#include "bsearch.h"
 
 // Get verse from line number in BibleC file
-// (broken)
-int bsearch_getVerse(char buffer[], int line) {
+int bsearch_getVerse(char buffer[], int line, struct Biblec_translation *translation) {
 	int result = 0;
 
 	// Locate book
 	int book = 0;
-	while (translation.books[book].start <= line) {
+	while (translation->books[book].start <= line) {
 		if (book >= MAX_BOOKS) {
 			return -1;
 		}
@@ -32,34 +26,34 @@ int bsearch_getVerse(char buffer[], int line) {
 
 	book--;
 	
-	result = translation.books[book].start;
+	result = translation->books[book].start;
 
 	// Get right under last chapter
 	int chapter = 0;
 	while (result <= line) {
-		if (chapter > translation.books[book].length) {
+		if (chapter > translation->books[book].length) {
 			return -1;
 		}
 
-		result += translation.books[book].chapters[chapter];
+		result += translation->books[book].chapters[chapter];
 		chapter++;
 	}
 	
-	result -= translation.books[book].chapters[chapter - 1];
+	result -= translation->books[book].chapters[chapter - 1];
 	line -= result;
 
 	// (verses start at zero)
 	line++;
 
-	sprintf(buffer, "%s %d %d", translation.books[book].name, chapter, line);
+	sprintf(buffer, "%s %d %d", translation->books[book].name, chapter, line);
 	return 0;
 }
 
-int getHits(int hits[], char string[]) {
+int getHits(int hits[], char string[], struct Biblec_translation *translation) {
 	int hit = 0;
 	int line = 0;
 	
-	FILE *verseFile = fopen(translation.location, "r");
+	FILE *verseFile = fopen(translation->location, "r");
 	if (verseFile == NULL) {
 		free(hits);
 		return -1;
@@ -83,7 +77,6 @@ int getHits(int hits[], char string[]) {
 				// Quit if no useful data was read
 				if (wc <= MIN_WORD) {
 					word[wc] = '\0';
-					//printf("%d\n", hit);
 					wc = 0;
 					continue;
 				}
@@ -118,17 +111,9 @@ int getHits(int hits[], char string[]) {
 	return hit;
 }
 
-int bsearch_get(char **words, int length, int result[]) {
-	int tryFile = biblec_parse(
-		&translation,
-		"biblec/bibles/web.i"
-	);
-
-	if (tryFile) {
-		return -1;
-	}
-	
-	int hit1 = getHits(result, words[0]);
+int bsearch_open(char **words, int length, int result[],
+		struct Biblec_translation *translation) {
+	int hit1 = getHits(result, words[0], translation);
 	if (hit1 == -1) {
 		return -1;
 	}
@@ -144,7 +129,7 @@ int bsearch_get(char **words, int length, int result[]) {
 		}
 		
 		int *hits2 = malloc(MAX_HITS);
-		int hit2 = getHits(hits2, words[w]);
+		int hit2 = getHits(hits2, words[w], translation);
 		if (hit2 == -1) {
 			free(hits2);
 			return -1;
