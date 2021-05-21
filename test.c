@@ -18,12 +18,12 @@ int main() {
 		return -1;
 	}
 
-	char *mySearch[] = {
+	char mySearch[][BSEARCH_MAX_WORD] = {
 		"created",
 		"beginning"
 	};
 
-	int *result = malloc(MAX_HITS);
+	int *result = malloc(BSEARCH_MAX_HITS);
 	int c = bsearch_open(
 		mySearch,
 		sizeof(mySearch) / sizeof(mySearch[0]),

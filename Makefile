@@ -1,5 +1,5 @@
 t ?= web
-dir ?= ../heb12cli
+dir ?= ..
 
 default:
 	@$(CC) -I$(dir) $(dir)/biblec/biblec.c bsearch.c test.c -o test.out
