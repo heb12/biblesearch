@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <biblec/main.h>
+#include <biblec/biblec.h>
 
 #include "bsearch.h"
 
@@ -17,11 +17,12 @@ int bsearch_getVerse(char buffer[], int line, struct Biblec_translation *transla
 	// Locate book
 	int book = 0;
 	while (translation->books[book].start <= line) {
-		if (book >= MAX_BOOKS) {
-			return -1;
-		}
-		
 		book++;
+
+		// Assume overflow means last book
+		if (book > MAX_BOOKS - 1) {
+			break;
+		}
 	}
 
 	book--;
@@ -32,7 +33,7 @@ int bsearch_getVerse(char buffer[], int line, struct Biblec_translation *transla
 	int chapter = 0;
 	while (result <= line) {
 		if (chapter > translation->books[book].length) {
-			return -1;
+			return -2;
 		}
 
 		result += translation->books[book].chapters[chapter];

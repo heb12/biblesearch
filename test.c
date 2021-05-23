@@ -44,12 +44,5 @@ int main() {
 	}
 
 	free(result);
-
-	puts("bsearch_getVerse bugs:");
-	bsearch_getVerse(buffer, 30650, &translation);
-	puts(buffer);
-	bsearch_getVerse(buffer, 31093, &translation);
-	puts(buffer);
-
 	return 0;
 }
