@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
-#include <biblec/main.h>
+#include <biblec/biblec.h>
 
 #include "bsearch.h"
 
@@ -17,6 +18,8 @@ int main() {
 	if (tryFile) {
 		return -1;
 	}
+
+	clock_t start = clock();
 
 	char mySearch[][BSEARCH_MAX_WORD] = {
 		"created",
@@ -42,6 +45,9 @@ int main() {
 		bsearch_getVerse(buffer, result[i], &translation);
 		printf("%d\t%s\n", result[i], buffer);
 	}
+
+	double elapsed = (double)(clock() - start) / CLOCKS_PER_SEC;
+	printf("Done in %f seconds.\n", elapsed);
 
 	free(result);
 	return 0;

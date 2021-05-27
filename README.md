@@ -1,4 +1,6 @@
 # BibleSearch
 An efficient algorithm for searching Bible text.
 
-To see the old JS/Python version, see:  https://code.heb12.com/heb12/biblesearch/src/commit/e4dd8b334988f3f8049a03dc2fb317b49f0eb938
+In `legacy/`, there is an older Python-based legacy version.  
+It was designed for server usage and is fairly slow due to  
+being written in Python.
