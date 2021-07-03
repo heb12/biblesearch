@@ -7,7 +7,7 @@
 
 #include "bsearch.h"
 
-struct Biblec_translation translation;
+struct BiblecTranslation translation;
 
 int main() {
 	int tryFile = biblec_parse(
@@ -23,7 +23,8 @@ int main() {
 
 	char mySearch[][BSEARCH_MAX_WORD] = {
 		"created",
-		"beginning"
+		"heavens",
+		"earth"
 	};
 
 	int *result = malloc(BSEARCH_MAX_HITS);

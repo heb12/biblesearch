@@ -11,7 +11,7 @@
 #include "bsearch.h"
 
 // Get verse from line number in BibleC file
-int bsearch_getVerse(char buffer[], int line, struct Biblec_translation *translation) {
+int bsearch_getVerse(char buffer[], int line, struct BiblecTranslation *translation) {
 	int result = 0;
 
 	// Locate book
@@ -46,11 +46,13 @@ int bsearch_getVerse(char buffer[], int line, struct Biblec_translation *transla
 	// (verses start at zero)
 	line++;
 
+	// TODO: return as a structure instead of a
+	// possible useless string
 	sprintf(buffer, "%s %d %d", translation->books[book].name, chapter, line);
 	return 0;
 }
 
-int getHits(int hits[], char string[], struct Biblec_translation *translation) {
+int getHits(int hits[], char string[], struct BiblecTranslation *translation) {
 	int hit = 0;
 	int line = 0;
 	
@@ -113,7 +115,7 @@ int getHits(int hits[], char string[], struct Biblec_translation *translation) {
 }
 
 int bsearch_open(char words[][BSEARCH_MAX_WORD], int length, int result[],
-		struct Biblec_translation *translation) {
+		struct BiblecTranslation *translation) {
 	int hit1 = getHits(result, words[0], translation);
 	if (hit1 == -1) {
 		return -1;

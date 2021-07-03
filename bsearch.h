@@ -6,9 +6,9 @@
 #define BSEARCH_MIN_WORD 2
 
 int bsearch_getVerse(char buffer[], int line,
-		struct Biblec_translation *translation);
+		struct BiblecTranslation *translation);
 
 int bsearch_open(char words[][BSEARCH_MAX_WORD], int length, int result[],
-		struct Biblec_translation *translation);
+		struct BiblecTranslation *translation);
 
 #endif
