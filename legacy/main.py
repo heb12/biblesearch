@@ -43,14 +43,16 @@ def getVerses(word):
 			shell = True
 		)
 	except Exception as e:
-		return {"error": 1, "message": "Error getting verses."}
+	    err = "Error getting verses."
+		return {"error": 1, "message": err, "errors": [err]}
 
 	# Filter out the string some
 	result = resultLine.decode("utf-8").replace("\n", "")
 
 	# If blank, then it is returned NULL by grep
 	if result == "":
-		return {"error": 1, "message": "Error, word '" + word + "' not found."}
+	    err = "Error, word '" + word + "' not found."
+		return {"error": 1, "message": err, "errors": err}
 
 	result = int(result);
 
@@ -60,6 +62,7 @@ def getVerses(word):
 	# Return the equivalent line in data/verses, with return type
 	return {
 		"error": 0,
+		"errors": [],
 		"verses": getLine(dataFolder + "/verses", int(result))
 	}
 
