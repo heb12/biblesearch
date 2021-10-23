@@ -44,7 +44,7 @@ int bsearch_getVerse(char buffer[], int line, struct BiblecTranslation *translat
 	line -= result;
 
 	// (verses start at zero)
-	line++;
+	//line++;
 
 	// TODO: return as a structure instead of a
 	// possible useless string
@@ -114,56 +114,72 @@ int getHits(int hits[], char string[], struct BiblecTranslation *translation) {
 	return hit;
 }
 
-int bsearch_open(char words[][BSEARCH_MAX_WORD], int length, int result[],
-		struct BiblecTranslation *translation) {
-	int hit1 = getHits(result, words[0], translation);
-	if (hit1 == -1) {
+int bsearch_open(char mySearch[][BSEARCH_MAX_WORD], int length,
+		int hits[BSEARCH_MAX_HITS], struct BiblecTranslation *translation) {
+	int hiti = 0;
+
+	char buffer[6000];
+	char word[64];
+	int line = 0;
+
+	FILE *verseFile = fopen(translation->location, "r");
+	if (verseFile == NULL) {
 		return -1;
 	}
 
-	if (length == 1) {
-		return hit1;
-	}
+	while (fgets(buffer, VERSE_LENGTH, verseFile) != NULL) {
+		int match[1024] = {0};
+	
+		int wc = 0;
+		int wordi = 0;
+		for (int c = 0; buffer[c] != '\0'; c++) {			
+			// Make sure this is an alphabetical character
+			if (buffer[c] >= 'a' && buffer[c] <= 'z') {
+				word[wc] = buffer[c];
+				wc++;
+			} else if (buffer[c] >= 'A' && buffer[c] <= 'Z') {
+				// Make character lowercase
+				word[wc] = buffer[c] + ('a' - 'A');
+				wc++;
+			} else if (buffer[c] == ' ' || buffer[c] == '\n') {
+				// Quit if no useful data was read
+				if (wc <= BSEARCH_MIN_WORD) {
+					word[wc] = '\0';
+					wc = 0;
+					continue;
+				}
+				
+				// Reset once we encounter new line
+				word[wc] = '\0';
+				wc = 0;
 
-	int m = 0;
-	for (int w = 1; w < length; w++) {
-		if (strlen(words[w]) <= BSEARCH_MIN_WORD) {
-			continue;
-		}
-		
-		int *hits2 = malloc(BSEARCH_MAX_HITS);
-		int hit2 = getHits(hits2, words[w], translation);
-		if (hit2 == -1) {
-			free(hits2);
-			return -1;
-		}
-
-		// Match last word with current word
-		m = 0;
-		int *temp = malloc(BSEARCH_MAX_HITS);
-		for (int x = 0; x < hit1; x++) {
-			for (int y = 0; y < hit2; y++) {
-				if (result[x] == hits2[y]) {
-					temp[m] = result[x];
-					m++;
-
-					// Max results reached, don't quit, but
-					// kill matching silently
-					if (m > BSEARCH_MAX_HITS) {
-						free(hits2);
-						free(temp);
-						return m;
+				for (int i = 0; i < length; i++) {
+					if (!strcmp(mySearch[i], word)) {
+						match[i]++;
+						break;
 					}
 				}
+
+				wordi++;
+			}
+		}
+		
+		line++;
+
+		int fullMatch = 1;
+		for (int i = 0; i < length; i++) {
+			if (!match[i]) {
+				fullMatch = 0;
 			}
 		}
 
-		// Copy for matching next
-		memcpy(result, temp, sizeof(int) * m);
-
-		free(hits2);
-		free(temp);
+		if (fullMatch) {
+			hits[hiti] = line;
+			hiti++;
+		}
 	}
 
-	return m;
+	fclose(verseFile);
+
+	return hiti;
 }

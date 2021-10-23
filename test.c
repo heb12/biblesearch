@@ -12,7 +12,7 @@ struct BiblecTranslation translation;
 int main() {
 	int tryFile = biblec_parse(
 		&translation,
-		"/home/dan/.local/share/heb12/web.i"
+		"/home/daniel/.local/share/heb12/web.i"
 	);
 
 	if (tryFile) {
@@ -22,34 +22,32 @@ int main() {
 	clock_t start = clock();
 
 	char mySearch[][BSEARCH_MAX_WORD] = {
-		"created",
-		"heavens",
-		"earth"
+		"for",
+		"god",
+		"loved",
+		"world",
 	};
 
-	int *result = malloc(BSEARCH_MAX_HITS);
-	int c = bsearch_open(
-		mySearch,
-		sizeof(mySearch) / sizeof(mySearch[0]),
-		result,
-		&translation
-	);
+	int *hits = malloc(BSEARCH_MAX_HITS * sizeof(int));
 
-	printf("Result: %d\n", c);
+	int c = bsearch_open(mySearch,
+		sizeof(mySearch) / sizeof(mySearch[0]), hits, &translation);
 
 	if (c == -1) {
-		return -1;
+		puts("Err");
+		return 1;
 	}
 
-	char buffer[128];
+	char buffer[1024];
 	for (int i = 0; i < c; i++) {
-		bsearch_getVerse(buffer, result[i], &translation);
-		printf("%d\t%s\n", result[i], buffer);
+		bsearch_getVerse(buffer, hits[i], &translation);
+		printf("%d\t%s\n", hits[i], buffer);
 	}
+
+	free(hits);
 
 	double elapsed = (double)(clock() - start) / CLOCKS_PER_SEC;
 	printf("Done in %f seconds.\n", elapsed);
 
-	free(result);
 	return 0;
 }
